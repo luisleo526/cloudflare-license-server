@@ -123,8 +123,8 @@ export default {
         const body = await request.json();
         const { tx_hash, mac } = body;
         
-        if (!tx_hash || !mac) {
-          return new Response('Missing tx_hash or mac in body', { status: 400 });
+        if (!tx_hash) {
+          return new Response('Missing tx_hash in body', { status: 400 });
         }
 
         // Check if transaction was already used
@@ -202,7 +202,7 @@ export default {
 
         const licenseKey = crypto.randomUUID();
         await env.LICENSE_KV.put(licenseKey, JSON.stringify({ 
-          bound_mac: mac, 
+          bound_mac: mac || null, // Optional MAC binding at purchase
           expiration,
           tx_hash,
           amount_usdt: amountUSDT,

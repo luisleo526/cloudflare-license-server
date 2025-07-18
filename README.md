@@ -39,6 +39,7 @@ This is a simple license server built with Cloudflare Workers and KV.
   - Returns { "license_key": "uuid", "expires": "YYYY-MM-DD", "amount_paid": 10.5, "days_granted": 90 }
   - Pricing: $5+ = 30 days, $10+ = 90 days, $20+ = 180 days, $50+ = 365 days
   - Returns 409 if transaction already used, 400 if invalid/insufficient payment
+  - MAC address is optional; if not provided, license will be bound on first validation
 
 - Extend license with USDT: POST /extend with JSON body { "tx_hash": "transaction_hash", "license_key": "uuid" }
   - Verifies USDT TRC20 payment and extends license expiration

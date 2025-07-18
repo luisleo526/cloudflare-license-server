@@ -110,8 +110,8 @@ Create a license by verifying a USDT TRC20 payment.
 **Request Body**:
 ```json
 {
-  "tx_hash": "abc123def456...",  // TRON transaction hash
-  "mac": "00:11:22:33:44:55"
+  "tx_hash": "abc123def456...",  // TRON transaction hash (required)
+  "mac": "00:11:22:33:44:55"     // MAC address (optional)
 }
 ```
 
@@ -124,6 +124,11 @@ Create a license by verifying a USDT TRC20 payment.
   "days_granted": 90
 }
 ```
+
+**Notes**:
+- MAC address is optional during purchase
+- If MAC is not provided, the license will be bound on first validation
+- If MAC is provided, the license is pre-bound to that device
 
 **Pricing**:
 - $5+ = 30 days
@@ -272,6 +277,12 @@ curl -X POST https://your-worker.workers.dev/validate \
 
 ### Purchase with USDT
 ```bash
+# Without MAC address (will be bound on first use)
+curl -X POST https://your-worker.workers.dev/purchase \
+  -H "Content-Type: application/json" \
+  -d '{"tx_hash": "abc123..."}'
+
+# With MAC address (pre-bound)
 curl -X POST https://your-worker.workers.dev/purchase \
   -H "Content-Type: application/json" \
   -d '{"tx_hash": "abc123...", "mac": "00:11:22:33:44:55"}'
