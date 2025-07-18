@@ -30,7 +30,7 @@ export default {
 
       if (!expiration) {
         const now = new Date();
-        now.setDate(now.getDate() + 14);
+        now.setDate(now.getDate() + 3);
         expiration = now.toISOString().split('T')[0]; // YYYY-MM-DD
       }
 
