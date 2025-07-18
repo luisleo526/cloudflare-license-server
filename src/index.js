@@ -3,6 +3,12 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'POST' && url.pathname === '/create') {
+      const clientIp = request.headers.get('CF-Connecting-IP');
+      const whitelist = (env.IP_WHITELIST || '').split(',').map(ip => ip.trim());
+      if (whitelist.length > 0 && !whitelist.includes(clientIp)) {
+        return new Response('IP not authorized', { status: 403 });
+      }
+
       const adminKey = request.headers.get('X-Admin-Key');
       if (adminKey !== env.ADMIN_KEY) {
         return new Response('Unauthorized', { status: 401 });

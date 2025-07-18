@@ -12,6 +12,10 @@ This is a simple license server built with Cloudflare Workers and KV.
 3. Set admin secret: `npx wrangler secret put ADMIN_KEY`
    - Enter your secret admin key.
 
+   Optional: Set IP whitelist (comma-separated IPs) for /create: `npx wrangler secret put IP_WHITELIST`
+   - e.g., Enter: "1.2.3.4,5.6.7.8"
+   - If set, only these IPs can access /create (in addition to admin key).
+
 4. Deploy: `npx wrangler deploy`
 
 ## Usage
