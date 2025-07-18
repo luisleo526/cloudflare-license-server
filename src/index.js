@@ -43,6 +43,43 @@ export default {
       });
     }
 
+    if (request.method === 'POST' && url.pathname === '/test') {
+      try {
+        const body = await request.json();
+        const { mac } = body;
+        if (!mac) {
+          return new Response('Missing mac in body', { status: 400 });
+        }
+
+        // Check if any license is already bound to this MAC
+        const keys = await env.LICENSE_KV.list();
+        for (const key of keys.keys) {
+          const license = await env.LICENSE_KV.get(key.name);
+          if (license) {
+            const data = JSON.parse(license);
+            if (data.bound_mac === mac) {
+              return new Response('MAC address already has a license', { status: 409 });
+            }
+          }
+        }
+
+        // Create a 7-day test license
+        const now = new Date();
+        now.setDate(now.getDate() + 7);
+        const expiration = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        const licenseKey = crypto.randomUUID();
+        await env.LICENSE_KV.put(licenseKey, JSON.stringify({ bound_mac: mac, expiration, is_test: true }));
+
+        return new Response(JSON.stringify({ license_key: licenseKey, expires: expiration }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        return new Response('Error processing request: ' + error.message, { status: 500 });
+      }
+    }
+
     if (request.method === 'POST' && url.pathname === '/validate') {
       try {
         const body = await request.json();

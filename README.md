@@ -27,4 +27,8 @@ This is a simple license server built with Cloudflare Workers and KV.
 - Validate: POST /validate with JSON body { "key": "uuid", "mac": "mac-address" }
   - Returns 200 if valid (binds if unbound), 403 if bound to different mac or invalid for device, 410 if expired, 404 if not found.
 
+- Get test license: POST /test with JSON body { "mac": "mac-address" }
+  - Returns { "license_key": "uuid", "expires": "YYYY-MM-DD" } with a 7-day test license
+  - Returns 409 if MAC already has a license bound to it
+
 Note: This uses only Cloudflare Workers and KV; no other services. 
