@@ -1,0 +1,13 @@
+{
+  "name": "license-server",
+  "version": "1.0.0",
+  "description": "License server using Cloudflare Workers and KV",
+  "main": "src/index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+} 
