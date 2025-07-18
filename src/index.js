@@ -8,8 +8,28 @@ export default {
         return new Response('Unauthorized', { status: 401 });
       }
 
+      let expiration = null;
+      try {
+        const body = await request.json();
+        if (body.expiration) {
+          // Validate YYYY-MM-DD format
+          if (!/\d{4}-\d{2}-\d{2}/.test(body.expiration)) {
+            return new Response('Invalid expiration format (use YYYY-MM-DD)', { status: 400 });
+          }
+          expiration = body.expiration;
+        }
+      } catch (error) {
+        return new Response('Error parsing body: ' + error.message, { status: 400 });
+      }
+
+      if (!expiration) {
+        const now = new Date();
+        now.setDate(now.getDate() + 14);
+        expiration = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      }
+
       const licenseKey = crypto.randomUUID();
-      await env.LICENSE_KV.put(licenseKey, JSON.stringify({ bound_mac: null }));
+      await env.LICENSE_KV.put(licenseKey, JSON.stringify({ bound_mac: null, expiration }));
 
       return new Response(JSON.stringify({ license_key: licenseKey }), {
         status: 200,
@@ -31,6 +51,15 @@ export default {
         }
 
         const data = JSON.parse(license);
+
+        // Check expiration if set
+        if (data.expiration) {
+          const expDate = new Date(data.expiration);
+          const now = new Date();
+          if (now > expDate) {
+            return new Response('License expired', { status: 410 });
+          }
+        }
 
         if (data.bound_mac === null) {
           data.bound_mac = mac;
