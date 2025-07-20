@@ -2,6 +2,25 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Helper function to convert hex to base58 TRON address without Buffer
+    const hexToTronAddress = (hexAddress) => {
+      // Remove 0x prefix if present and padding zeros
+      const cleanHex = hexAddress.replace(/^0x/, '').substring(24);
+      
+      // Convert hex to bytes
+      const bytes = new Uint8Array(
+        ('41' + cleanHex).match(/.{1,2}/g).map(byte => parseInt(byte, 16))
+      );
+      
+      // Convert to base64 and then to base58-like format
+      const base64 = btoa(String.fromCharCode(...bytes));
+      
+      return 'T' + base64
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    };
+
     if (request.method === 'POST' && url.pathname === '/create') {
       const clientIp = request.headers.get('CF-Connecting-IP');
       const whitelist = (env.IP_WHITELIST || '').split(',').map(ip => ip.trim());
@@ -171,9 +190,8 @@ export default {
 
         // Extract recipient address (remove method ID, get next 32 bytes)
         const recipientHex = data.substring(8, 72);
-        // Remove padding (24 zeros) and add TRON prefix
-        const recipientAddress = 'T' + Buffer.from('41' + recipientHex.substring(24), 'hex').toString('base64')
-          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        // Convert to TRON address using helper function
+        const recipientAddress = hexToTronAddress(recipientHex);
 
         // Verify recipient is your wallet
         if (recipientAddress !== env.TRON_WALLET_ADDRESS) {
@@ -290,9 +308,8 @@ export default {
 
         // Extract recipient address (remove method ID, get next 32 bytes)
         const recipientHex = data.substring(8, 72);
-        // Remove padding (24 zeros) and add TRON prefix
-        const recipientAddress = 'T' + Buffer.from('41' + recipientHex.substring(24), 'hex').toString('base64')
-          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        // Convert to TRON address using helper function
+        const recipientAddress = hexToTronAddress(recipientHex);
 
         // Verify recipient is your wallet
         if (recipientAddress !== env.TRON_WALLET_ADDRESS) {
