@@ -30,7 +30,7 @@ export default {
 
       if (!expiration) {
         const now = new Date();
-        now.setDate(now.getDate() + 3);
+        now.setDate(now.getDate() + 14);
         expiration = now.toISOString().split('T')[0]; // YYYY-MM-DD
       }
 
@@ -65,7 +65,7 @@ export default {
 
         // Create a 7-day test license
         const now = new Date();
-        now.setDate(now.getDate() + 7);
+        now.setDate(now.getDate() + 3);
         const expiration = now.toISOString().split('T')[0]; // YYYY-MM-DD
 
         const licenseKey = crypto.randomUUID();
