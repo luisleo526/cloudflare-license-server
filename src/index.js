@@ -390,7 +390,7 @@ export default {
         const now = new Date();
         const expirationDate = new Date(data.expiration);
         const isExpired = expirationDate < now;
-        const daysRemaining = isExpired ? 0 : Math.ceil((expirationDate - now) / (1000 * 60 * 60 * 24));
+        const daysRemaining = isExpired ? 0 : Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
         return new Response(JSON.stringify({
           license_key: licenseKey,
